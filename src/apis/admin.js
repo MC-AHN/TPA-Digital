@@ -7,120 +7,203 @@ const adminRoute = new Hono();
 
 // --- KELOLA USTADZ ---
 adminRoute.get("/ustadz", async (c) => {
-  const onlyUstadz = c.req.query("role");
-  
-  let query = db.select({ id: ustadz.id, username: ustadz.username, role: ustadz.role }).from(ustadz);
-  
-  if (onlyUstadz) {
-    query = query.where(eq(ustadz.role, onlyUstadz));
+  try {
+    const roleFilter = c.req.query("role");
+    
+    // Ambil kolom ustadz secara eksplisit
+    let query = db.select({ 
+      id: ustadz.id, 
+      username: ustadz.username, 
+      role: ustadz.role,
+      status: ustadz.status 
+    }).from(ustadz);
+    
+    if (roleFilter) {
+      query = query.where(eq(ustadz.role, roleFilter));
+    }
+
+    const data = await query;
+    return c.json({ success: true, data });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
   }
-
-  const data = await query;
-  return c.json({ success: true, data });
 });
 
+// POST: Tambah Ustadz Baru
 adminRoute.post("/ustadz", async (c) => {
-  const { username, password, role } = await c.req.json();
-  if (!username || !password) return c.json({ success: false, message: "Username & password wajib" }, 400);
+  try {
+    const { username, password, role, status } = await c.req.json();
+    if (!username || !password) {
+      return c.json({ success: false, message: "Username & password wajib diisi" }, 400);
+    }
 
-  const [newUser] = await db.insert(ustadz).values({ username, password, role: role || "ustadz" }).returning();
-  return c.json({ success: true, data: newUser }, 201);
+    const [newUser] = await db.insert(ustadz).values({ 
+      username, 
+      password, 
+      role: role || "ustadz",
+      status: status || "aktif"
+    }).returning();
+
+    return c.json({ success: true, data: newUser }, 201);
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
+// PUT: Edit Ustadz / Reset Password / Ubah Status
 adminRoute.put("/ustadz/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  const { username, password, role } = await c.req.json();
-  const updateData = { username, role };
-  if (password) updateData.password = password;
+  try {
+    const id = Number(c.req.param("id"));
+    const { username, password, role, status } = await c.req.json();
 
-  await db.update(ustadz).set(updateData).where(eq(ustadz.id, id));
-  return c.json({ success: true, message: "Ustadz diperbarui" });
+    if (!username) {
+      return c.json({ success: false, message: "Username tidak boleh kosong" }, 400);
+    }
+
+    const updateData = {
+      username,
+      role: role || "ustadz",
+      status: status || "aktif"
+    };
+    
+    // Hanya update password jika admin mengisi field password
+    if (password && typeof password === "string" && password.trim() !== "") {
+      updateData.password = password.trim();
+    }
+
+    await db.update(ustadz).set(updateData).where(eq(ustadz.id, id));
+    return c.json({ success: true, message: "Data ustadz / password berhasil diperbarui" });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.delete("/ustadz/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  await db.delete(ustadz).where(eq(ustadz.id, id));
-  return c.json({ success: true, message: "Ustadz dihapus" });
+  try {
+    const id = Number(c.req.param("id"));
+    await db.delete(ustadz).where(eq(ustadz.id, id));
+    return c.json({ success: true, message: "Ustadz berhasil dihapus" });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 // --- KELOLA HALAQAH ---
 adminRoute.get("/halaqah", async (c) => {
-  const data = await db
-    .select({
-      id: halaqah.id,
-      namaHalaqah: halaqah.namaHalaqah,
-      ustadzPjId: halaqah.ustadzPjId,
-      namaUstadz: ustadz.username,
-    })
-    .from(halaqah)
-    .leftJoin(ustadz, eq(halaqah.ustadzPjId, ustadz.id));
-  return c.json({ success: true, data });
+  try {
+    const data = await db
+      .select({
+        id: halaqah.id,
+        namaHalaqah: halaqah.namaHalaqah,
+        ustadzPjId: halaqah.ustadzPjId,
+        namaUstadz: ustadz.username,
+      })
+      .from(halaqah)
+      .leftJoin(ustadz, eq(halaqah.ustadzPjId, ustadz.id));
+    return c.json({ success: true, data });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.post("/halaqah", async (c) => {
-  const { namaHalaqah, ustadzPjId } = await c.req.json();
-  if (!namaHalaqah) return c.json({ success: false, message: "Nama halaqah wajib" }, 400);
+  try {
+    const { namaHalaqah, ustadzPjId } = await c.req.json();
+    if (!namaHalaqah) return c.json({ success: false, message: "Nama halaqah wajib" }, 400);
 
-  const [newHalaqah] = await db.insert(halaqah).values({ namaHalaqah, ustadzPjId: Number(ustadzPjId) || null }).returning();
-  return c.json({ success: true, data: newHalaqah }, 201);
+    const [newHalaqah] = await db.insert(halaqah).values({ 
+      namaHalaqah, 
+      ustadzPjId: ustadzPjId ? Number(ustadzPjId) : null 
+    }).returning();
+    return c.json({ success: true, data: newHalaqah }, 201);
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.put("/halaqah/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  const { namaHalaqah, ustadzPjId } = await c.req.json();
-  await db.update(halaqah).set({ namaHalaqah, ustadzPjId: Number(ustadzPjId) || null }).where(eq(halaqah.id, id));
-  return c.json({ success: true, message: "Halaqah diperbarui" });
+  try {
+    const id = Number(c.req.param("id"));
+    const { namaHalaqah, ustadzPjId } = await c.req.json();
+    await db.update(halaqah).set({ 
+      namaHalaqah, 
+      ustadzPjId: ustadzPjId ? Number(ustadzPjId) : null 
+    }).where(eq(halaqah.id, id));
+    return c.json({ success: true, message: "Halaqah diperbarui" });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.delete("/halaqah/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  await db.delete(halaqah).where(eq(halaqah.id, id));
-  return c.json({ success: true, message: "Halaqah dihapus" });
+  try {
+    const id = Number(c.req.param("id"));
+    await db.delete(halaqah).where(eq(halaqah.id, id));
+    return c.json({ success: true, message: "Halaqah dihapus" });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 // --- KELOLA SANTRI ---
 adminRoute.get("/santri", async (c) => {
-  const data = await db
-    .select({
-      id: santri.id,
-      nama: santri.nama,
-      kategori: santri.kategori,
-      status: santri.status,
-      halaqahId: santri.halaqahId,
-      namaHalaqah: halaqah.namaHalaqah,
-    })
-    .from(santri)
-    .leftJoin(halaqah, eq(santri.halaqahId, halaqah.id));
-  return c.json({ success: true, data });
+  try {
+    const data = await db
+      .select({
+        id: santri.id,
+        nama: santri.nama,
+        kategori: santri.kategori,
+        status: santri.status,
+        halaqahId: santri.halaqahId,
+        namaHalaqah: halaqah.namaHalaqah,
+      })
+      .from(santri)
+      .leftJoin(halaqah, eq(santri.halaqahId, halaqah.id));
+    return c.json({ success: true, data });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.post("/santri", async (c) => {
-  const { nama, kategori, halaqahId } = await c.req.json();
-  if (!nama) return c.json({ success: false, message: "Nama santri wajib" }, 400);
+  try {
+    const { nama, kategori, halaqahId } = await c.req.json();
+    if (!nama) return c.json({ success: false, message: "Nama santri wajib" }, 400);
 
-  const [newSantri] = await db.insert(santri).values({
-    nama,
-    kategori: kategori || "reguler",
-    halaqahId: halaqahId ? Number(halaqahId) : null,
-  }).returning();
-  return c.json({ success: true, data: newSantri }, 201);
+    const [newSantri] = await db.insert(santri).values({
+      nama,
+      kategori: kategori || "reguler",
+      halaqahId: halaqahId ? Number(halaqahId) : null,
+    }).returning();
+    return c.json({ success: true, data: newSantri }, 201);
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.put("/santri/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  const { nama, kategori, halaqahId } = await c.req.json();
-  await db.update(santri).set({
-    nama,
-    kategori,
-    halaqahId: halaqahId ? Number(halaqahId) : null,
-  }).where(eq(santri.id, id));
-  return c.json({ success: true, message: "Santri diperbarui" });
+  try {
+    const id = Number(c.req.param("id"));
+    const { nama, kategori, halaqahId } = await c.req.json();
+    await db.update(santri).set({
+      nama,
+      kategori,
+      halaqahId: halaqahId ? Number(halaqahId) : null,
+    }).where(eq(santri.id, id));
+    return c.json({ success: true, message: "Santri diperbarui" });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 adminRoute.delete("/santri/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  await db.delete(santri).where(eq(santri.id, id));
-  return c.json({ success: true, message: "Santri dihapus" });
+  try {
+    const id = Number(c.req.param("id"));
+    await db.delete(santri).where(eq(santri.id, id));
+    return c.json({ success: true, message: "Santri dihapus" });
+  } catch (err) {
+    return c.json({ success: false, message: err.message }, 500);
+  }
 });
 
 export default adminRoute;

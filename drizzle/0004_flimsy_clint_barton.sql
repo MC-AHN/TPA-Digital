@@ -1,0 +1,1 @@
+ALTER TABLE "ustadz" ADD COLUMN "status" varchar(20) DEFAULT 'aktif' NOT NULL;

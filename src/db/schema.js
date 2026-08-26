@@ -7,6 +7,7 @@ export const ustadz = pgTable("ustadz", {
     username: varchar("username", { length: 100 }).notNull().unique(),
     password: varchar("password", { length: 256 }).notNull(),
     role: varchar("role", { length: 20 }).default("ustadz").notNull(), // 'admin' | 'ustadz'
+    status: varchar("status", { length: 20 }).default("aktif").notNull(), // 'aktif' | 'nonaktif'
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

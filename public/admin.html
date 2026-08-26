@@ -111,12 +111,21 @@
             <input type="hidden" id="edit-ustadz-id">
             <input type="text" id="ustadz-user" required placeholder="Username"
                 class="w-full p-2 border rounded-lg text-sm">
+
             <input type="password" id="ustadz-pass" placeholder="Password (Kosongkan jika tidak diubah)"
                 class="w-full p-2 border rounded-lg text-sm">
-            <select id="ustadz-role" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                <option value="ustadz">Ustadz</option>
-                <option value="admin">Admin</option>
-            </select>
+
+            <div class="grid grid-cols-2 gap-2">
+                <select id="ustadz-role" class="p-2 border rounded-lg text-sm bg-slate-50">
+                    <option value="ustadz">Ustadz</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <select id="ustadz-status" class="p-2 border rounded-lg text-sm bg-slate-50">
+                    <option value="aktif">Aktif</option>
+                    <option value="nonaktif">Nonaktif</option>
+                </select>
+            </div>
+
             <div class="flex gap-2">
                 <button type="submit" id="btn-ustadz-submit"
                     class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
@@ -132,6 +141,7 @@
                     <tr>
                         <th class="p-3">Username</th>
                         <th class="p-3">Role</th>
+                        <th class="p-3">Status</th>
                         <th class="p-3 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -161,10 +171,9 @@
         let cacheSantri = [], cacheHalaqah = [], cacheUstadz = [];
 
         async function loadAllData() {
-            // 1. Ustadz
-            // 1. Fetch Ustadz (Dua query: semua user untuk tabel, khusus role ustadz untuk dropdown PJ)
+            // 1. Fetch Ustadz (Perbaikan shadowing variabel cacheUstadz)
             const resAllU = await fetch('/api/admin/ustadz');
-            const cacheUstadz = (await resAllU.json()).data || [];
+            cacheUstadz = (await resAllU.json()).data || [];
 
             const resOnlyU = await fetch('/api/admin/ustadz?role=ustadz');
             const listOnlyUstadz = (await resOnlyU.json()).data || [];
@@ -175,25 +184,30 @@
             tbU.innerHTML = '';
             optU.innerHTML = '<option value="">-- Pilih Ustadz PJ --</option>';
 
-            // Isi tabel Ustadz (Semua user)
+            // Isi tabel Ustadz
             cacheUstadz.forEach(u => {
                 tbU.innerHTML += `
-      <tr>
-        <td class="p-3 font-semibold">${u.username}</td>
-        <td class="p-3 uppercase text-[10px]"><span class="bg-slate-100 px-2 py-0.5 rounded">${u.role}</span></td>
-        <td class="p-3 text-right space-x-1">
-          <button onclick="editUstadz(${u.id})" class="text-blue-600 hover:underline">Edit</button>
-          <button onclick="deleteUstadz(${u.id})" class="text-rose-600 hover:underline">Hapus</button>
-        </td>
-      </tr>`;
+            <tr>
+                <td class="p-3 font-semibold">${u.username}</td>
+                <td class="p-3 uppercase text-[10px]"><span class="bg-slate-100 px-2 py-0.5 rounded">${u.role}</span></td>
+                <td class="p-3 text-[10px]">
+                    <span class="px-2 py-0.5 rounded font-bold ${u.status === 'aktif' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                        ${(u.status || 'aktif').toUpperCase()}
+                    </span>
+                </td>
+                <td class="p-3 text-right space-x-1">
+                    <button onclick="editUstadz(${u.id})" class="text-blue-600 hover:underline">Edit</button>
+                    <button onclick="deleteUstadz(${u.id})" class="text-rose-600 hover:underline">Hapus</button>
+                </td>
+            </tr>`;
             });
 
-            // Isi Dropdown PJ Halaqah (Khusus role 'ustadz')
+            // Isi Dropdown PJ Halaqah
             listOnlyUstadz.forEach(u => {
                 optU.innerHTML += `<option value="${u.id}">${u.username}</option>`;
             });
 
-            // 2. Halaqah
+            // 2. Fetch Halaqah
             const resH = await fetch('/api/admin/halaqah');
             cacheHalaqah = (await resH.json()).data || [];
             const tbH = document.getElementById('list-halaqah-tb');
@@ -212,7 +226,7 @@
                 optH.innerHTML += `<option value="${h.id}">${h.namaHalaqah}</option>`;
             });
 
-            // 3. Santri
+            // 3. Fetch Santri
             const resS = await fetch('/api/admin/santri');
             cacheSantri = (await resS.json()).data || [];
             const tbS = document.getElementById('list-santri-tb');
@@ -231,7 +245,7 @@
             });
         }
 
-        // --- LOGIKA SANTRI (CREATE/UPDATE/DELETE) ---
+        // --- LOGIKA SANTRI ---
         document.getElementById('form-santri').onsubmit = async (e) => {
             e.preventDefault();
             const editId = document.getElementById('edit-santri-id').value;
@@ -278,7 +292,7 @@
             }
         }
 
-        // --- LOGIKA HALAQAH (CREATE/UPDATE/DELETE) ---
+        // --- LOGIKA HALAQAH ---
         document.getElementById('form-halaqah').onsubmit = async (e) => {
             e.preventDefault();
             const editId = document.getElementById('edit-halaqah-id').value;
@@ -323,10 +337,18 @@
             }
         }
 
-        // --- LOGIKA USTADZ (CREATE/UPDATE/DELETE) ---
+        // --- LOGIKA USTADZ ---
         document.getElementById('form-ustadz').onsubmit = async (e) => {
             e.preventDefault();
             const editId = document.getElementById('edit-ustadz-id').value;
+            const password = document.getElementById('ustadz-pass').value;
+
+            // Validasi password saat buat ustadz baru
+            if (!editId && !password) {
+                alert('Password wajib diisi untuk akun baru!');
+                return;
+            }
+
             const url = editId ? `/api/admin/ustadz/${editId}` : '/api/admin/ustadz';
             const method = editId ? 'PUT' : 'POST';
 
@@ -335,8 +357,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     username: document.getElementById('ustadz-user').value,
-                    password: document.getElementById('ustadz-pass').value,
+                    password: password,
                     role: document.getElementById('ustadz-role').value,
+                    status: document.getElementById('ustadz-status').value,
                 })
             });
             resetFormUstadz();
@@ -350,7 +373,9 @@
             document.getElementById('ustadz-user').value = u.username;
             document.getElementById('ustadz-pass').value = '';
             document.getElementById('ustadz-role').value = u.role;
-            document.getElementById('title-ustadz').innerText = 'Edit Akun Ustadz';
+            document.getElementById('ustadz-status').value = u.status || 'aktif';
+
+            document.getElementById('title-ustadz').innerText = 'Edit Akun / Reset Password';
             document.getElementById('btn-ustadz-submit').innerText = 'Update Akun';
             document.getElementById('btn-ustadz-cancel').classList.remove('hidden');
         }

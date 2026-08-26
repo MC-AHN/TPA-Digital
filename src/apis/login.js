@@ -23,6 +23,10 @@ login.post("/", async (c) => {
     if (!user || user.password !== password) {
       return c.json({ success: false, message: "Username atau password salah" }, 401);
     }
+    
+    if (user.status === "nonaktif") {
+      return c.json({ success: false, message: "Akun Anda telah dinonaktifkan oleh Admin" }, 403);
+    }
 
     const today = new Date().toISOString().split("T")[0];
 
