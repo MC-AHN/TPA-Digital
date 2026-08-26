@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Ustadz - TPA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+  <div class="bg-white p-6 rounded-2xl shadow-md w-full max-w-sm border border-slate-200">
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-bold text-emerald-700">TPA Mutaba'ah</h1>
+      <p class="text-xs text-slate-500 mt-1">Presensi & Masuk Sistem Ustadz</p>
+    </div>
+
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+        <input type="text" id="username" required placeholder="Masukkan username"
+          class="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:outline-emerald-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+        <input type="password" id="password" required placeholder="••••••••"
+          class="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:outline-emerald-600">
+      </div>
+
+      <!-- Input Catatan Izin Opsional -->
+      <div class="border-t pt-3 mt-3">
+        <label class="block text-xs font-semibold text-amber-700 mb-1">Izin Tidak Mengajar? (Opsional)</label>
+        <input type="text" id="keteranganIzin" placeholder="Isi alasan jika tidak bisa mengajar hari ini"
+          class="w-full p-2.5 border border-amber-200 rounded-lg text-sm bg-amber-50/50 focus:outline-amber-600">
+        <p class="text-[10px] text-slate-400 mt-1">*Jika diisi, Anda dicatat izin dan halaqah Anda akan dialihkan
+          sebagai Badal.</p>
+      </div>
+
+      <button type="submit" id="btn-submit"
+        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition">
+        Masuk / Presensi
+      </button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const keteranganIzin = document.getElementById('keteranganIzin').value;
+      const btn = document.getElementById('btn-submit');
+
+      btn.disabled = true;
+      btn.innerText = 'Memproses...';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, keteranganIzin })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          if (result.isIzin) {
+            alert(result.message);
+            document.getElementById('keteranganIzin').value = '';
+          } else {
+            localStorage.setItem('token', result.data.token);
+            localStorage.setItem('user', JSON.stringify(result.data.user));
+
+            // Redirect berdasarkan Role
+            if (result.data.user.role === 'admin') {
+              window.location.href = '/admin.html';
+            } else {
+              alert(result.message || 'Login gagal!');
+              window.location.href = '/';
+            }
+          }
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Masuk / Presensi';
+      }
+    });
+  </script>
+</body>
+
+</html>

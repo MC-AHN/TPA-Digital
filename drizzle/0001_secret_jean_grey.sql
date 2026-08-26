@@ -1,0 +1,1 @@
+ALTER TABLE "log_mutabaah_tpa" ADD COLUMN "catatan_absen" text;

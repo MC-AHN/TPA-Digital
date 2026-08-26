@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TPA Mutaba'ah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800 p-4 max-w-2xl mx-auto min-h-screen">
+
+    <header class="mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <div>
+            <h1 class="text-lg font-bold text-emerald-700">Panel Admin TPA</h1>
+            <p class="text-xs text-slate-500">Kelola Ustadz, Halaqah & Santri</p>
+        </div>
+        <div>
+            <button onclick="logout()"
+                class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 font-medium px-3 py-1.5 rounded-lg">Logout</button>
+        </div>
+    </header>
+
+    <!-- Navigation Tab -->
+    <div class="flex border-b border-slate-200 mb-6 gap-2">
+        <button onclick="switchTab('santri')" id="tab-santri"
+            class="py-2 px-4 text-xs font-bold border-b-2 border-emerald-600 text-emerald-700">Data Santri</button>
+        <button onclick="switchTab('halaqah')" id="tab-halaqah"
+            class="py-2 px-4 text-xs font-medium text-slate-500 hover:text-slate-800">Data Halaqah</button>
+        <button onclick="switchTab('ustadz')" id="tab-ustadz"
+            class="py-2 px-4 text-xs font-medium text-slate-500 hover:text-slate-800">Data Ustadz</button>
+    </div>
+
+    <!-- TAB 1: SANTRI -->
+    <section id="sec-santri" class="space-y-4">
+        <form id="form-santri" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+            <h3 id="title-santri" class="text-xs font-bold text-slate-600 uppercase">Tambah Santri Baru</h3>
+            <input type="hidden" id="edit-santri-id">
+            <input type="text" id="santri-nama" required placeholder="Nama Lengkap Santri"
+                class="w-full p-2 border rounded-lg text-sm">
+            <div class="grid grid-cols-2 gap-2">
+                <select id="santri-kategori" class="p-2 border rounded-lg text-sm bg-slate-50">
+                    <option value="reguler">Reguler</option>
+                    <option value="khusus">Khusus</option>
+                </select>
+                <select id="santri-halaqah" class="p-2 border rounded-lg text-sm bg-slate-50">
+                    <option value="">-- Pilih Halaqah --</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" id="btn-santri-submit"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
+                    Santri</button>
+                <button type="button" id="btn-santri-cancel" onclick="resetFormSantri()"
+                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-sm">Batal</button>
+            </div>
+        </form>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 border-b">
+                    <tr>
+                        <th class="p-3">Nama Santri</th>
+                        <th class="p-3">Kategori</th>
+                        <th class="p-3">Halaqah</th>
+                        <th class="p-3 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="list-santri-tb" class="divide-y"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- TAB 2: HALAQAH -->
+    <section id="sec-halaqah" class="hidden space-y-4">
+        <form id="form-halaqah" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+            <h3 id="title-halaqah" class="text-xs font-bold text-slate-600 uppercase">Tambah Halaqah Baru</h3>
+            <input type="hidden" id="edit-halaqah-id">
+            <input type="text" id="halaqah-nama" required placeholder="Nama Halaqah"
+                class="w-full p-2 border rounded-lg text-sm">
+            <select id="halaqah-ustadz" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                <option value="">-- Pilih Ustadz PJ --</option>
+            </select>
+            <div class="flex gap-2">
+                <button type="submit" id="btn-halaqah-submit"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
+                    Halaqah</button>
+                <button type="button" id="btn-halaqah-cancel" onclick="resetFormHalaqah()"
+                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-sm">Batal</button>
+            </div>
+        </form>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 border-b">
+                    <tr>
+                        <th class="p-3">Nama Halaqah</th>
+                        <th class="p-3">Ustadz PJ</th>
+                        <th class="p-3 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="list-halaqah-tb" class="divide-y"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- TAB 3: USTADZ -->
+    <section id="sec-ustadz" class="hidden space-y-4">
+        <form id="form-ustadz" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+            <h3 id="title-ustadz" class="text-xs font-bold text-slate-600 uppercase">Tambah Akun Ustadz / Admin</h3>
+            <input type="hidden" id="edit-ustadz-id">
+            <input type="text" id="ustadz-user" required placeholder="Username"
+                class="w-full p-2 border rounded-lg text-sm">
+            <input type="password" id="ustadz-pass" placeholder="Password (Kosongkan jika tidak diubah)"
+                class="w-full p-2 border rounded-lg text-sm">
+            <select id="ustadz-role" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                <option value="ustadz">Ustadz</option>
+                <option value="admin">Admin</option>
+            </select>
+            <div class="flex gap-2">
+                <button type="submit" id="btn-ustadz-submit"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
+                    Akun</button>
+                <button type="button" id="btn-ustadz-cancel" onclick="resetFormUstadz()"
+                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-sm">Batal</button>
+            </div>
+        </form>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 border-b">
+                    <tr>
+                        <th class="p-3">Username</th>
+                        <th class="p-3">Role</th>
+                        <th class="p-3 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="list-ustadz-tb" class="divide-y"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!localStorage.getItem('token') || user.role !== 'admin') {
+            alert('Akses khusus Admin!');
+            window.location.href = '/login.html';
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+
+        function switchTab(tab) {
+            ['santri', 'halaqah', 'ustadz'].forEach(t => {
+                document.getElementById(`sec-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = 'py-2 px-4 text-xs font-medium text-slate-500 hover:text-slate-800';
+            });
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = 'py-2 px-4 text-xs font-bold border-b-2 border-emerald-600 text-emerald-700';
+        }
+
+        let cacheSantri = [], cacheHalaqah = [], cacheUstadz = [];
+
+        async function loadAllData() {
+            // 1. Ustadz
+            // 1. Fetch Ustadz (Dua query: semua user untuk tabel, khusus role ustadz untuk dropdown PJ)
+            const resAllU = await fetch('/api/admin/ustadz');
+            const cacheUstadz = (await resAllU.json()).data || [];
+
+            const resOnlyU = await fetch('/api/admin/ustadz?role=ustadz');
+            const listOnlyUstadz = (await resOnlyU.json()).data || [];
+
+            const tbU = document.getElementById('list-ustadz-tb');
+            const optU = document.getElementById('halaqah-ustadz');
+
+            tbU.innerHTML = '';
+            optU.innerHTML = '<option value="">-- Pilih Ustadz PJ --</option>';
+
+            // Isi tabel Ustadz (Semua user)
+            cacheUstadz.forEach(u => {
+                tbU.innerHTML += `
+      <tr>
+        <td class="p-3 font-semibold">${u.username}</td>
+        <td class="p-3 uppercase text-[10px]"><span class="bg-slate-100 px-2 py-0.5 rounded">${u.role}</span></td>
+        <td class="p-3 text-right space-x-1">
+          <button onclick="editUstadz(${u.id})" class="text-blue-600 hover:underline">Edit</button>
+          <button onclick="deleteUstadz(${u.id})" class="text-rose-600 hover:underline">Hapus</button>
+        </td>
+      </tr>`;
+            });
+
+            // Isi Dropdown PJ Halaqah (Khusus role 'ustadz')
+            listOnlyUstadz.forEach(u => {
+                optU.innerHTML += `<option value="${u.id}">${u.username}</option>`;
+            });
+
+            // 2. Halaqah
+            const resH = await fetch('/api/admin/halaqah');
+            cacheHalaqah = (await resH.json()).data || [];
+            const tbH = document.getElementById('list-halaqah-tb');
+            const optH = document.getElementById('santri-halaqah');
+            tbH.innerHTML = ''; optH.innerHTML = '<option value="">-- Pilih Halaqah --</option>';
+            cacheHalaqah.forEach(h => {
+                tbH.innerHTML += `
+          <tr>
+            <td class="p-3 font-semibold">${h.namaHalaqah}</td>
+            <td class="p-3 text-slate-500">${h.namaUstadz || '-'}</td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="editHalaqah(${h.id})" class="text-blue-600 hover:underline">Edit</button>
+              <button onclick="deleteHalaqah(${h.id})" class="text-rose-600 hover:underline">Hapus</button>
+            </td>
+          </tr>`;
+                optH.innerHTML += `<option value="${h.id}">${h.namaHalaqah}</option>`;
+            });
+
+            // 3. Santri
+            const resS = await fetch('/api/admin/santri');
+            cacheSantri = (await resS.json()).data || [];
+            const tbS = document.getElementById('list-santri-tb');
+            tbS.innerHTML = '';
+            cacheSantri.forEach(s => {
+                tbS.innerHTML += `
+          <tr>
+            <td class="p-3 font-semibold">${s.nama}</td>
+            <td class="p-3 capitalize">${s.kategori}</td>
+            <td class="p-3 text-slate-500">${s.namaHalaqah || '-'}</td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="editSantri(${s.id})" class="text-blue-600 hover:underline">Edit</button>
+              <button onclick="deleteSantri(${s.id})" class="text-rose-600 hover:underline">Hapus</button>
+            </td>
+          </tr>`;
+            });
+        }
+
+        // --- LOGIKA SANTRI (CREATE/UPDATE/DELETE) ---
+        document.getElementById('form-santri').onsubmit = async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('edit-santri-id').value;
+            const url = editId ? `/api/admin/santri/${editId}` : '/api/admin/santri';
+            const method = editId ? 'PUT' : 'POST';
+
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nama: document.getElementById('santri-nama').value,
+                    kategori: document.getElementById('santri-kategori').value,
+                    halaqahId: document.getElementById('santri-halaqah').value,
+                })
+            });
+            resetFormSantri();
+            loadAllData();
+        };
+
+        function editSantri(id) {
+            const s = cacheSantri.find(item => item.id === id);
+            if (!s) return;
+            document.getElementById('edit-santri-id').value = s.id;
+            document.getElementById('santri-nama').value = s.nama;
+            document.getElementById('santri-kategori').value = s.kategori;
+            document.getElementById('santri-halaqah').value = s.halaqahId || '';
+            document.getElementById('title-santri').innerText = 'Edit Data Santri';
+            document.getElementById('btn-santri-submit').innerText = 'Update Santri';
+            document.getElementById('btn-santri-cancel').classList.remove('hidden');
+        }
+
+        function resetFormSantri() {
+            document.getElementById('edit-santri-id').value = '';
+            document.getElementById('santri-nama').value = '';
+            document.getElementById('title-santri').innerText = 'Tambah Santri Baru';
+            document.getElementById('btn-santri-submit').innerText = 'Simpan Santri';
+            document.getElementById('btn-santri-cancel').classList.add('hidden');
+        }
+
+        async function deleteSantri(id) {
+            if (confirm('Yakin ingin menghapus santri ini?')) {
+                await fetch(`/api/admin/santri/${id}`, { method: 'DELETE' });
+                loadAllData();
+            }
+        }
+
+        // --- LOGIKA HALAQAH (CREATE/UPDATE/DELETE) ---
+        document.getElementById('form-halaqah').onsubmit = async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('edit-halaqah-id').value;
+            const url = editId ? `/api/admin/halaqah/${editId}` : '/api/admin/halaqah';
+            const method = editId ? 'PUT' : 'POST';
+
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    namaHalaqah: document.getElementById('halaqah-nama').value,
+                    ustadzPjId: document.getElementById('halaqah-ustadz').value,
+                })
+            });
+            resetFormHalaqah();
+            loadAllData();
+        };
+
+        function editHalaqah(id) {
+            const h = cacheHalaqah.find(item => item.id === id);
+            if (!h) return;
+            document.getElementById('edit-halaqah-id').value = h.id;
+            document.getElementById('halaqah-nama').value = h.namaHalaqah;
+            document.getElementById('halaqah-ustadz').value = h.ustadzPjId || '';
+            document.getElementById('title-halaqah').innerText = 'Edit Data Halaqah';
+            document.getElementById('btn-halaqah-submit').innerText = 'Update Halaqah';
+            document.getElementById('btn-halaqah-cancel').classList.remove('hidden');
+        }
+
+        function resetFormHalaqah() {
+            document.getElementById('edit-halaqah-id').value = '';
+            document.getElementById('halaqah-nama').value = '';
+            document.getElementById('title-halaqah').innerText = 'Tambah Halaqah Baru';
+            document.getElementById('btn-halaqah-submit').innerText = 'Simpan Halaqah';
+            document.getElementById('btn-halaqah-cancel').classList.add('hidden');
+        }
+
+        async function deleteHalaqah(id) {
+            if (confirm('Yakin ingin menghapus halaqah ini?')) {
+                await fetch(`/api/admin/halaqah/${id}`, { method: 'DELETE' });
+                loadAllData();
+            }
+        }
+
+        // --- LOGIKA USTADZ (CREATE/UPDATE/DELETE) ---
+        document.getElementById('form-ustadz').onsubmit = async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('edit-ustadz-id').value;
+            const url = editId ? `/api/admin/ustadz/${editId}` : '/api/admin/ustadz';
+            const method = editId ? 'PUT' : 'POST';
+
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('ustadz-user').value,
+                    password: document.getElementById('ustadz-pass').value,
+                    role: document.getElementById('ustadz-role').value,
+                })
+            });
+            resetFormUstadz();
+            loadAllData();
+        };
+
+        function editUstadz(id) {
+            const u = cacheUstadz.find(item => item.id === id);
+            if (!u) return;
+            document.getElementById('edit-ustadz-id').value = u.id;
+            document.getElementById('ustadz-user').value = u.username;
+            document.getElementById('ustadz-pass').value = '';
+            document.getElementById('ustadz-role').value = u.role;
+            document.getElementById('title-ustadz').innerText = 'Edit Akun Ustadz';
+            document.getElementById('btn-ustadz-submit').innerText = 'Update Akun';
+            document.getElementById('btn-ustadz-cancel').classList.remove('hidden');
+        }
+
+        function resetFormUstadz() {
+            document.getElementById('edit-ustadz-id').value = '';
+            document.getElementById('ustadz-user').value = '';
+            document.getElementById('ustadz-pass').value = '';
+            document.getElementById('title-ustadz').innerText = 'Tambah Akun Ustadz / Admin';
+            document.getElementById('btn-ustadz-submit').innerText = 'Simpan Akun';
+            document.getElementById('btn-ustadz-cancel').classList.add('hidden');
+        }
+
+        async function deleteUstadz(id) {
+            if (confirm('Yakin ingin menghapus ustadz ini?')) {
+                await fetch(`/api/admin/ustadz/${id}`, { method: 'DELETE' });
+                loadAllData();
+            }
+        }
+
+        loadAllData();
+    </script>
+</body>
+
+</html>
