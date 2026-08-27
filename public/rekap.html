@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buku Presensi & Rekap TPA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; padding: 0; }
+      .print-area { border: none !important; shadow: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 max-w-4xl mx-auto min-h-screen">
+
+  <!-- Navigasi (Tidak Ikut Tertebal saat Diprint) -->
+  <header class="no-print mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+    <div>
+      <h1 class="text-lg font-bold text-emerald-700">Rekap Buku Presensi TPA</h1>
+      <p class="text-xs text-slate-500">Cetak Laporan / Export ke Excel</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="/admin.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-lg">Kembali ke Admin</a>
+      <button onclick="window.print()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg">🖨️ Cetak / Save PDF</button>
+      <button onclick="exportCSV()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded-lg">📊 Download Excel (.csv)</button>
+    </div>
+  </header>
+
+  <!-- Filter Mode & Bulan -->
+  <div class="no-print bg-white p-4 rounded-xl border border-slate-200 mb-6 flex flex-wrap gap-4 items-center">
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 mb-1">Pilih Jenis Rekap</label>
+      <select id="mode-rekap" onchange="toggleFilterMode()" class="p-2 border rounded-lg text-sm bg-slate-50">
+        <option value="ustadz">Presensi Ustadz</option>
+        <option value="santri">Presensi Santri Per Halaqah</option>
+      </select>
+    </div>
+
+    <div id="filter-halaqah-container" class="hidden">
+      <label class="block text-xs font-semibold text-slate-500 mb-1">Pilih Halaqah</label>
+      <select id="select-halaqah" onchange="loadRekapData()" class="p-2 border rounded-lg text-sm bg-slate-50"></select>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 mb-1">Bulan & Tahun</label>
+      <input type="month" id="filter-bulan" onchange="loadRekapData()" class="p-2 border rounded-lg text-sm bg-slate-50">
+    </div>
+  </div>
+
+  <!-- Area Dokumen Cetak -->
+  <div class="print-area bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+    <div class="text-center border-b pb-4 mb-6">
+      <h2 class="text-xl font-bold uppercase text-slate-800">BUKU PRESENSI & MUTABA'AH TPA</h2>
+      <p class="text-xs text-slate-500" id="doc-subtitle">Rekap Bulanan</p>
+    </div>
+
+    <!-- Tabel Data Rekap -->
+    <table class="w-full text-left text-xs border-collapse border border-slate-300">
+      <thead class="bg-slate-100 text-slate-700" id="table-head"></thead>
+      <tbody id="table-body" class="divide-y divide-slate-200"></tbody>
+    </table>
+
+    <!-- Area Tanda Tangan Cetak -->
+    <div class="mt-12 flex justify-between text-xs px-6">
+      <div class="text-center">
+        <p>Mengetahui,</p>
+        <p class="font-bold mt-12">Kepala TPA</p>
+      </div>
+      <div class="text-center">
+        <p id="ttd-date">Semarang, ...</p>
+        <p class="font-bold mt-12">Pengurus / Ustadz PJ</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Set Default Bulan saat ini YYYY-MM
+    document.getElementById('filter-bulan').value = new Date().toISOString().slice(0, 7);
+    document.getElementById('ttd-date').innerText = `Tanggal Cetak: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+    let currentData = [];
+
+    async function initHalaqahOptions() {
+      const res = await fetch('/api/admin/halaqah');
+      const { data } = await res.json();
+      const select = document.getElementById('select-halaqah');
+      select.innerHTML = '';
+      data.forEach(h => {
+        select.innerHTML += `<option value="${h.id}">${h.namaHalaqah}</option>`;
+      });
+    }
+
+    function toggleFilterMode() {
+      const mode = document.getElementById('mode-rekap').value;
+      const halaqahContainer = document.getElementById('filter-halaqah-container');
+      if (mode === 'santri') {
+        halaqahContainer.classList.remove('hidden');
+      } else {
+        halaqahContainer.classList.add('hidden');
+      }
+      loadRekapData();
+    }
+
+    async function loadRekapData() {
+      const mode = document.getElementById('mode-rekap').value;
+      const bulan = document.getElementById('filter-bulan').value;
+      const thead = document.getElementById('table-head');
+      const tbody = document.getElementById('table-body');
+      const subtitle = document.getElementById('doc-subtitle');
+
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">Memuat data...</td></tr>';
+
+      if (mode === 'ustadz') {
+        subtitle.innerText = `Rekap Kehadiran Ustadz - Periode: ${bulan}`;
+        thead.innerHTML = `
+          <tr>
+            <th class="border border-slate-300 p-2">No</th>
+            <th class="border border-slate-300 p-2">Nama Ustadz</th>
+            <th class="border border-slate-300 p-2 text-center">Hadir</th>
+            <th class="border border-slate-300 p-2 text-center">Izin/Sakit</th>
+            <th class="border border-slate-300 p-2 text-center">Total Hari</th>
+          </tr>`;
+
+        const res = await fetch(`/api/rekap/ustadz?bulan=${bulan}`);
+        const result = await res.json();
+        currentData = result.data || [];
+        tbody.innerHTML = '';
+
+        currentData.forEach((u, i) => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="border border-slate-300 p-2 text-center">${i + 1}</td>
+              <td class="border border-slate-300 p-2 font-bold">${u.username}</td>
+              <td class="border border-slate-300 p-2 text-center text-emerald-700 font-bold">${u.hadir}</td>
+              <td class="border border-slate-300 p-2 text-center text-amber-700 font-bold">${u.izin}</td>
+              <td class="border border-slate-300 p-2 text-center">${u.totalHari}</td>
+            </tr>`;
+        });
+      } else {
+        const halaqahId = document.getElementById('select-halaqah').value;
+        const halaqahName = document.getElementById('select-halaqah').options[document.getElementById('select-halaqah').selectedIndex]?.text || '';
+        subtitle.innerText = `Rekap Mutaba'ah Santri (${halaqahName}) - Periode: ${bulan}`;
+        
+        thead.innerHTML = `
+          <tr>
+            <th class="border border-slate-300 p-2">No</th>
+            <th class="border border-slate-300 p-2">Nama Santri</th>
+            <th class="border border-slate-300 p-2 text-center">Hadir</th>
+            <th class="border border-slate-300 p-2 text-center">Izin</th>
+            <th class="border border-slate-300 p-2 text-center">Sakit</th>
+            <th class="border border-slate-300 p-2 text-center">Alpa</th>
+            <th class="border border-slate-300 p-2">Capaian Terakhir</th>
+          </tr>`;
+
+        if (!halaqahId) return;
+        const res = await fetch(`/api/rekap/santri?halaqahId=${halaqahId}&bulan=${bulan}`);
+        const result = await res.json();
+        currentData = result.data || [];
+        tbody.innerHTML = '';
+
+        currentData.forEach((s, i) => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="border border-slate-300 p-2 text-center">${i + 1}</td>
+              <td class="border border-slate-300 p-2 font-bold">${s.nama}</td>
+              <td class="border border-slate-300 p-2 text-center text-emerald-700 font-bold">${s.hadir}</td>
+              <td class="border border-slate-300 p-2 text-center">${s.izin}</td>
+              <td class="border border-slate-300 p-2 text-center">${s.sakit}</td>
+              <td class="border border-slate-300 p-2 text-center text-rose-700">${s.alpa}</td>
+              <td class="border border-slate-300 p-2">${s.capaianTerakhir}</td>
+            </tr>`;
+        });
+      }
+    }
+
+    // Function Export Excel (.CSV)
+    function exportCSV() {
+      if (!currentData || currentData.length === 0) {
+        alert('Tidak ada data untuk diexport!');
+        return;
+      }
+      const mode = document.getElementById('mode-rekap').value;
+      const bulan = document.getElementById('filter-bulan').value;
+      let csvContent = "data:text/csv;charset=utf-8,";
+
+      if (mode === 'ustadz') {
+        csvContent += "No,Nama Ustadz,Hadir,Izin,Total Hari\n";
+        currentData.forEach((u, i) => {
+          csvContent += `${i + 1},"${u.username}",${u.hadir},${u.izin},${u.totalHari}\n`;
+        });
+      } else {
+        csvContent += "No,Nama Santri,Hadir,Izin,Sakit,Alpa,Capaian Terakhir\n";
+        currentData.forEach((s, i) => {
+          csvContent += `${i + 1},"${s.nama}",${s.hadir},${s.izin},${s.sakit},${s.alpa},"${s.capaianTerakhir}"\n`;
+        });
+      }
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Rekap_TPA_${mode}_${bulan}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    initHalaqahOptions().then(loadRekapData);
+  </script>
+</body>
+</html>

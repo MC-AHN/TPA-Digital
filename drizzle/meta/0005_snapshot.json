@@ -1,0 +1,378 @@
+{
+  "id": "fc54c4b0-f0cd-4ab9-a593-f4391e1fee1c",
+  "prevId": "7eb2ca66-014e-49cd-a3c8-2cc22124e1a3",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.absen_ustadz": {
+      "name": "absen_ustadz",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ustadz_id": {
+          "name": "ustadz_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tanggal": {
+          "name": "tanggal",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'hadir'"
+        },
+        "keterangan": {
+          "name": "keterangan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "absen_ustadz_ustadz_id_ustadz_id_fk": {
+          "name": "absen_ustadz_ustadz_id_ustadz_id_fk",
+          "tableFrom": "absen_ustadz",
+          "tableTo": "ustadz",
+          "columnsFrom": [
+            "ustadz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.halaqah_tpa": {
+      "name": "halaqah_tpa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nama_halaqah": {
+          "name": "nama_halaqah",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ustadz_pj_id": {
+          "name": "ustadz_pj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "halaqah_tpa_ustadz_pj_id_ustadz_id_fk": {
+          "name": "halaqah_tpa_ustadz_pj_id_ustadz_id_fk",
+          "tableFrom": "halaqah_tpa",
+          "tableTo": "ustadz",
+          "columnsFrom": [
+            "ustadz_pj_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.log_mutabaah_tpa": {
+      "name": "log_mutabaah_tpa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "santri_id": {
+          "name": "santri_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "halaqah_id": {
+          "name": "halaqah_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ustadz_id": {
+          "name": "ustadz_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tanggal": {
+          "name": "tanggal",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "status_absen": {
+          "name": "status_absen",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'hadir'"
+        },
+        "catatan_absen": {
+          "name": "catatan_absen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipe_bacaan": {
+          "name": "tipe_bacaan",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "capaian": {
+          "name": "capaian",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "catatan": {
+          "name": "catatan",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "log_mutabaah_tpa_santri_id_santri_tpa_id_fk": {
+          "name": "log_mutabaah_tpa_santri_id_santri_tpa_id_fk",
+          "tableFrom": "log_mutabaah_tpa",
+          "tableTo": "santri_tpa",
+          "columnsFrom": [
+            "santri_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "log_mutabaah_tpa_halaqah_id_halaqah_tpa_id_fk": {
+          "name": "log_mutabaah_tpa_halaqah_id_halaqah_tpa_id_fk",
+          "tableFrom": "log_mutabaah_tpa",
+          "tableTo": "halaqah_tpa",
+          "columnsFrom": [
+            "halaqah_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "log_mutabaah_tpa_ustadz_id_ustadz_id_fk": {
+          "name": "log_mutabaah_tpa_ustadz_id_ustadz_id_fk",
+          "tableFrom": "log_mutabaah_tpa",
+          "tableTo": "ustadz",
+          "columnsFrom": [
+            "ustadz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.santri_tpa": {
+      "name": "santri_tpa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nama": {
+          "name": "nama",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kategori": {
+          "name": "kategori",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'reguler'"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aktif'"
+        },
+        "halaqah_id": {
+          "name": "halaqah_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "santri_tpa_halaqah_id_halaqah_tpa_id_fk": {
+          "name": "santri_tpa_halaqah_id_halaqah_tpa_id_fk",
+          "tableFrom": "santri_tpa",
+          "tableTo": "halaqah_tpa",
+          "columnsFrom": [
+            "halaqah_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ustadz": {
+      "name": "ustadz",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ustadz'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ustadz_username_unique": {
+          "name": "ustadz_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

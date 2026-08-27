@@ -5,18 +5,22 @@ import { eq } from "drizzle-orm";
 
 const adminRoute = new Hono();
 
-// --- KELOLA USTADZ ---
+// ==========================================
+// KELOLA USTADZ (Murni Data Akun & Role)
+// ==========================================
+
+// GET: Ambil daftar ustadz (Bisa difilter berdasarkan role)
 adminRoute.get("/ustadz", async (c) => {
   try {
     const roleFilter = c.req.query("role");
     
-    // Ambil kolom ustadz secara eksplisit
-    let query = db.select({ 
-      id: ustadz.id, 
-      username: ustadz.username, 
-      role: ustadz.role,
-      status: ustadz.status 
-    }).from(ustadz);
+    let query = db
+      .select({ 
+        id: ustadz.id, 
+        username: ustadz.username, 
+        role: ustadz.role 
+      })
+      .from(ustadz);
     
     if (roleFilter) {
       query = query.where(eq(ustadz.role, roleFilter));
@@ -29,20 +33,22 @@ adminRoute.get("/ustadz", async (c) => {
   }
 });
 
-// POST: Tambah Ustadz Baru
+// POST: Tambah Akun Ustadz / Admin Baru
 adminRoute.post("/ustadz", async (c) => {
   try {
-    const { username, password, role, status } = await c.req.json();
+    const { username, password, role } = await c.req.json();
     if (!username || !password) {
       return c.json({ success: false, message: "Username & password wajib diisi" }, 400);
     }
 
-    const [newUser] = await db.insert(ustadz).values({ 
-      username, 
-      password, 
-      role: role || "ustadz",
-      status: status || "aktif"
-    }).returning();
+    const [newUser] = await db
+      .insert(ustadz)
+      .values({ 
+        username, 
+        password, 
+        role: role || "ustadz"
+      })
+      .returning();
 
     return c.json({ success: true, data: newUser }, 201);
   } catch (err) {
@@ -50,11 +56,11 @@ adminRoute.post("/ustadz", async (c) => {
   }
 });
 
-// PUT: Edit Ustadz / Reset Password / Ubah Status
+// PUT: Edit Username / Role / Reset Password Ustadz
 adminRoute.put("/ustadz/:id", async (c) => {
   try {
     const id = Number(c.req.param("id"));
-    const { username, password, role, status } = await c.req.json();
+    const { username, password, role } = await c.req.json();
 
     if (!username) {
       return c.json({ success: false, message: "Username tidak boleh kosong" }, 400);
@@ -62,11 +68,10 @@ adminRoute.put("/ustadz/:id", async (c) => {
 
     const updateData = {
       username,
-      role: role || "ustadz",
-      status: status || "aktif"
+      role: role || "ustadz"
     };
     
-    // Hanya update password jika admin mengisi field password
+    // Hanya update password jika admin mengisikan password baru
     if (password && typeof password === "string" && password.trim() !== "") {
       updateData.password = password.trim();
     }
@@ -78,6 +83,7 @@ adminRoute.put("/ustadz/:id", async (c) => {
   }
 });
 
+// DELETE: Hapus Akun Ustadz
 adminRoute.delete("/ustadz/:id", async (c) => {
   try {
     const id = Number(c.req.param("id"));
@@ -88,7 +94,9 @@ adminRoute.delete("/ustadz/:id", async (c) => {
   }
 });
 
-// --- KELOLA HALAQAH ---
+// ==========================================
+// KELOLA HALAQAH
+// ==========================================
 adminRoute.get("/halaqah", async (c) => {
   try {
     const data = await db
@@ -145,7 +153,9 @@ adminRoute.delete("/halaqah/:id", async (c) => {
   }
 });
 
-// --- KELOLA SANTRI ---
+// ==========================================
+// KELOLA SANTRI
+// ==========================================
 adminRoute.get("/santri", async (c) => {
   try {
     const data = await db

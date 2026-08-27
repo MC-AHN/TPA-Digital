@@ -15,7 +15,10 @@
             <h1 class="text-lg font-bold text-emerald-700">Panel Admin TPA</h1>
             <p class="text-xs text-slate-500">Kelola Ustadz, Halaqah & Santri</p>
         </div>
-        <div>
+        <div class="flex gap-2">
+            <a href="/rekap.html"
+                class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium px-3 py-1.5 rounded-lg">📑
+                Buku Presensi / Rekap</a>
             <button onclick="logout()"
                 class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 font-medium px-3 py-1.5 rounded-lg">Logout</button>
         </div>
@@ -120,10 +123,6 @@
                     <option value="ustadz">Ustadz</option>
                     <option value="admin">Admin</option>
                 </select>
-                <select id="ustadz-status" class="p-2 border rounded-lg text-sm bg-slate-50">
-                    <option value="aktif">Aktif</option>
-                    <option value="nonaktif">Nonaktif</option>
-                </select>
             </div>
 
             <div class="flex gap-2">
@@ -141,7 +140,6 @@
                     <tr>
                         <th class="p-3">Username</th>
                         <th class="p-3">Role</th>
-                        <th class="p-3">Status</th>
                         <th class="p-3 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -190,11 +188,6 @@
             <tr>
                 <td class="p-3 font-semibold">${u.username}</td>
                 <td class="p-3 uppercase text-[10px]"><span class="bg-slate-100 px-2 py-0.5 rounded">${u.role}</span></td>
-                <td class="p-3 text-[10px]">
-                    <span class="px-2 py-0.5 rounded font-bold ${u.status === 'aktif' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
-                        ${(u.status || 'aktif').toUpperCase()}
-                    </span>
-                </td>
                 <td class="p-3 text-right space-x-1">
                     <button onclick="editUstadz(${u.id})" class="text-blue-600 hover:underline">Edit</button>
                     <button onclick="deleteUstadz(${u.id})" class="text-rose-600 hover:underline">Hapus</button>
@@ -359,7 +352,6 @@
                     username: document.getElementById('ustadz-user').value,
                     password: password,
                     role: document.getElementById('ustadz-role').value,
-                    status: document.getElementById('ustadz-status').value,
                 })
             });
             resetFormUstadz();
@@ -373,7 +365,6 @@
             document.getElementById('ustadz-user').value = u.username;
             document.getElementById('ustadz-pass').value = '';
             document.getElementById('ustadz-role').value = u.role;
-            document.getElementById('ustadz-status').value = u.status || 'aktif';
 
             document.getElementById('title-ustadz').innerText = 'Edit Akun / Reset Password';
             document.getElementById('btn-ustadz-submit').innerText = 'Update Akun';

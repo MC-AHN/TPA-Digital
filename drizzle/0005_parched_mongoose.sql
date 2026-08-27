@@ -1,0 +1,1 @@
+ALTER TABLE "ustadz" DROP COLUMN "status";

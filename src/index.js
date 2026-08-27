@@ -8,6 +8,7 @@ import mutabaahRoute from "./apis/mutabaah.js";
 import login from "./apis/login.js";
 import halaqahRoute from "./apis/halaqah.js";
 import adminRoute from "./apis/admin.js";
+import rekapRoute from "./apis/rekap.js";
 
 const app = new Hono();
 app.use("/*", cors());
@@ -17,6 +18,7 @@ app.route("/api/mutabaah", mutabaahRoute);
 app.route("/api/login", login);
 app.route("/api/halaqah", halaqahRoute);
 app.route("/api/admin", adminRoute);
+app.route("/api/rekap", rekapRoute)
 
 // -- STATIC FILES --
 if (process.env.NODE_ENV !== "production") {
