@@ -6,7 +6,6 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "src/index.js" },
-    { "src": "/", "destination": "/rekap.html"},
     { "src": "/(.*)", "dest": "public/$1" }
   ]
 }
