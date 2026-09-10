@@ -153,6 +153,10 @@
     </section>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         if (!localStorage.getItem('token') || user.role !== 'admin') {
             alert('Akses khusus Admin!');

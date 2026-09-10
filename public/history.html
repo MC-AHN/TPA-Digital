@@ -41,6 +41,10 @@
   </main>
 
   <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+
     // Fetch Daftar Santri untuk Dropdown
     async function initSantriDropdown() {
       try {

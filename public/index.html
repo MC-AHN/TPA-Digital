@@ -52,6 +52,10 @@
   </section>
 
   <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+
     // Set Tanggal Hari Ini
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -93,8 +97,8 @@
           const btn = document.createElement('button');
           btn.onclick = () => selectHalaqah(h.id, h.namaHalaqah, h.isBadal);
           btn.className = `w-full text-left p-3 rounded-xl border transition flex justify-between items-center ${h.isBadal
-              ? 'bg-amber-50 border-amber-200 hover:bg-amber-100'
-              : 'bg-white border-slate-200 hover:border-emerald-500'
+            ? 'bg-amber-50 border-amber-200 hover:bg-amber-100'
+            : 'bg-white border-slate-200 hover:border-emerald-500'
             }`;
 
           btn.innerHTML = `
