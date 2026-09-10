@@ -35,19 +35,20 @@
   <header
     class="no-print mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
     <div>
-      <h1 class="text-lg font-bold text-emerald-700">Rekap Buku Presensi TPA</h1>
-      <p class="text-xs text-slate-500">Cetak Laporan / Export ke Excel</p>
+      <h1 class="text-lg font-bold text-emerald-700">TPA Mutaba'ah</h1>
+      <p class="text-xs text-slate-500">Buku Presensi & Laporan Digital</p>
     </div>
-    <div class="flex gap-2">
-      <a href="/admin.html"
-        class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-lg">Kembali ke
-        Admin</a>
+    <div class="flex gap-2 items-center">
+      <!-- Tombol Navigasi Login -->
+      <a href="/login.html"
+        class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg flex items-center gap-1">
+        🔑 Login Ustadz / Admin
+      </a>
       <button onclick="window.print()"
-        class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg">🖨️ Cetak /
-        Save PDF</button>
+        class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-lg">🖨️
+        Cetak</button>
       <button onclick="exportCSV()"
-        class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded-lg">📊 Download Excel
-        (.csv)</button>
+        class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded-lg">📊 Excel</button>
     </div>
   </header>
 
