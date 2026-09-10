@@ -66,7 +66,7 @@
 
     // Cek Auth & Auto-redirect Admin ke /admin.html
     if (!token) {
-      window.location.href = '/login.html';
+      window.location.href = '/rekap.html';
     } else if (user.role === 'admin') {
       window.location.href = '/admin.html';
     }
@@ -76,7 +76,7 @@
 
     function logout() {
       localStorage.clear();
-      window.location.href = '/login.html';
+      window.location.href = '/rekap.html';
     }
 
     // 1. Fetch & Render Daftar Halaqah (Menggunakan ID Ustadz yang sedang Login)
