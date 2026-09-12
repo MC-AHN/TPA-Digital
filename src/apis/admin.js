@@ -41,6 +41,8 @@ adminRoute.post("/ustadz", async (c) => {
       return c.json({ success: false, message: "Username & password wajib diisi" }, 400);
     }
 
+    username = username.trim().toLowerCase();
+
     const [newUser] = await db
       .insert(ustadz)
       .values({ 

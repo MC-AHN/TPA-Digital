@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { db } from "../db/index.js";
 import { santri, logMutabaah } from "../db/schema.js";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 const santriRoute = new Hono();
 
@@ -19,18 +19,17 @@ santriRoute.get("/", async (c) => {
   }
 });
 
-// POST: Tambah santri baru
-santriRoute.post("/", async (c) => {
+// GET: Direct /:id atau /:id/history agar dua-duanya aman dipanggil frontend
+santriRoute.get("/:id", async (c) => {
   try {
-    const { nama, kategori } = await c.req.json();
-    if (!nama) return c.json({ success: false, message: "Nama wajib diisi" }, 400);
+    const santriId = Number(c.req.param("id"));
+    const history = await db
+      .select()
+      .from(logMutabaah)
+      .where(eq(logMutabaah.santriId, santriId))
+      .orderBy(desc(logMutabaah.id));
 
-    const [newSantri] = await db
-      .insert(santri)
-      .values({ nama, kategori: kategori || "reguler" })
-      .returning();
-
-    return c.json({ success: true, data: newSantri }, 201);
+    return c.json({ success: true, data: history, history });
   } catch (error) {
     return c.json({ success: false, message: error.message }, 500);
   }
@@ -43,9 +42,10 @@ santriRoute.get("/:id/history", async (c) => {
     const history = await db
       .select()
       .from(logMutabaah)
-      .where(eq(logMutabaah.santriId, santriId));
+      .where(eq(logMutabaah.santriId, santriId))
+      .orderBy(desc(logMutabaah.id));
 
-    return c.json({ success: true, data: history });
+    return c.json({ success: true, data: history, history });
   } catch (error) {
     return c.json({ success: false, message: error.message }, 500);
   }

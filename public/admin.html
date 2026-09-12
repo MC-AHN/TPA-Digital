@@ -6,124 +6,152 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - TPA Mutaba'ah</title>
 
+    <!-- Favicon Ikon Tab Browser (Buku Saku Mutaba'ah) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/><path d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'/><path d='m9 10 2 2 4-4' stroke-width='2.5' stroke='%23059669'/></svg>">
+
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#059669">
 
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-100 text-slate-800 p-4 max-w-2xl mx-auto min-h-screen">
+<body class="bg-slate-100 text-slate-800 p-3 sm:p-4 max-w-2xl mx-auto min-h-screen font-sans">
 
-    <header class="mb-6 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div>
-            <h1 class="text-lg font-bold text-emerald-700">Panel Admin TPA</h1>
-            <p class="text-xs text-slate-500">Kelola Ustadz, Halaqah & Santri</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="/rekap.html"
-                class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium px-3 py-1.5 rounded-lg">📑
-                Buku Presensi / Rekap</a>
-            <button onclick="logout()"
-                class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 font-medium px-3 py-1.5 rounded-lg">Logout</button>
+    <header class="mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex items-center justify-between gap-2">
+            <!-- Header dengan Logo Baru -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-600/20 text-white shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        <path d="m9 10 2 2 4-4" stroke-width="2.5" class="stroke-emerald-200" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-800 leading-tight">Panel Admin</h1>
+                    <p class="text-[11px] text-slate-500 font-medium">Kelola Data TPA</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Tombol Rekap UI Baru -->
+                <a href="/rekap.html"
+                    class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-3 py-2 rounded-xl border border-emerald-200 flex items-center gap-1 transition">
+                    📑 Rekap
+                </a>
+                <!-- Tombol Logout -->
+                <button onclick="logout()"
+                    class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-2 rounded-xl border border-rose-200 transition">
+                    Logout
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Navigation Tab -->
-    <div class="flex border-b border-slate-200 mb-6 gap-2">
+    <div class="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
         <button onclick="switchTab('santri')" id="tab-santri"
-            class="py-2 px-4 text-xs font-bold border-b-2 border-emerald-600 text-emerald-700">Data Santri</button>
+            class="py-2 px-3 text-xs font-bold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap">Data
+            Santri</button>
         <button onclick="switchTab('halaqah')" id="tab-halaqah"
-            class="py-2 px-4 text-xs font-medium text-slate-500 hover:text-slate-800">Data Halaqah</button>
+            class="py-2 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 whitespace-nowrap">Data
+            Halaqah</button>
         <button onclick="switchTab('ustadz')" id="tab-ustadz"
-            class="py-2 px-4 text-xs font-medium text-slate-500 hover:text-slate-800">Data Ustadz</button>
+            class="py-2 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 whitespace-nowrap">Data
+            Ustadz</button>
+        <button onclick="switchTab('absen-ustadz')" id="tab-absen-ustadz"
+            class="py-2 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 whitespace-nowrap">Presensi
+            Ustadz</button>
     </div>
 
     <!-- TAB 1: SANTRI -->
     <section id="sec-santri" class="space-y-4">
-        <form id="form-santri" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+        <form id="form-santri" class="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
             <h3 id="title-santri" class="text-xs font-bold text-slate-600 uppercase">Tambah Santri Baru</h3>
             <input type="hidden" id="edit-santri-id">
             <input type="text" id="santri-nama" required placeholder="Nama Lengkap Santri"
-                class="w-full p-2 border rounded-lg text-sm">
-            <div class="grid grid-cols-2 gap-2">
-                <select id="santri-kategori" class="p-2 border rounded-lg text-sm bg-slate-50">
-                    <option value="reguler">Reguler</option>
-                    <option value="khusus">Khusus</option>
-                </select>
-                <select id="santri-halaqah" class="p-2 border rounded-lg text-sm bg-slate-50">
+                class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
+            <div>
+                <select id="santri-halaqah"
+                    class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
                     <option value="">-- Pilih Halaqah --</option>
                 </select>
             </div>
             <div class="flex gap-2">
                 <button type="submit" id="btn-santri-submit"
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl text-xs shadow-sm transition">Simpan
                     Santri</button>
                 <button type="button" id="btn-santri-cancel" onclick="resetFormSantri()"
-                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-sm">Batal</button>
+                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2.5 rounded-xl text-xs transition">Batal</button>
             </div>
         </form>
 
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-500 border-b">
-                    <tr>
-                        <th class="p-3">Nama Santri</th>
-                        <th class="p-3">Kategori</th>
-                        <th class="p-3">Halaqah</th>
-                        <th class="p-3 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="list-santri-tb" class="divide-y"></tbody>
-            </table>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 text-slate-500 border-b">
+                        <tr>
+                            <th class="p-3">Nama Santri</th>
+                            <th class="p-3">Halaqah</th>
+                            <th class="p-3 text-center w-28">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-santri-tb" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
     <!-- TAB 2: HALAQAH -->
     <section id="sec-halaqah" class="hidden space-y-4">
-        <form id="form-halaqah" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+        <form id="form-halaqah" class="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
             <h3 id="title-halaqah" class="text-xs font-bold text-slate-600 uppercase">Tambah Halaqah Baru</h3>
             <input type="hidden" id="edit-halaqah-id">
             <input type="text" id="halaqah-nama" required placeholder="Nama Halaqah"
-                class="w-full p-2 border rounded-lg text-sm">
-            <select id="halaqah-ustadz" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
+            <select id="halaqah-ustadz"
+                class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
                 <option value="">-- Pilih Ustadz PJ --</option>
             </select>
             <div class="flex gap-2">
                 <button type="submit" id="btn-halaqah-submit"
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl text-xs shadow-sm transition">Simpan
                     Halaqah</button>
                 <button type="button" id="btn-halaqah-cancel" onclick="resetFormHalaqah()"
-                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-sm">Batal</button>
+                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2.5 rounded-xl text-xs transition">Batal</button>
             </div>
         </form>
 
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-500 border-b">
-                    <tr>
-                        <th class="p-3">Nama Halaqah</th>
-                        <th class="p-3">Ustadz PJ</th>
-                        <th class="p-3 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="list-halaqah-tb" class="divide-y"></tbody>
-            </table>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 text-slate-500 border-b">
+                        <tr>
+                            <th class="p-3">Nama Halaqah</th>
+                            <th class="p-3">Ustadz PJ</th>
+                            <th class="p-3 text-center w-28">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-halaqah-tb" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
     <!-- TAB 3: USTADZ -->
     <section id="sec-ustadz" class="hidden space-y-4">
-        <form id="form-ustadz" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+        <form id="form-ustadz" class="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
             <h3 id="title-ustadz" class="text-xs font-bold text-slate-600 uppercase">Tambah Akun Ustadz / Admin</h3>
             <input type="hidden" id="edit-ustadz-id">
             <input type="text" id="ustadz-user" required placeholder="Username"
-                class="w-full p-2 border rounded-lg text-sm">
+                class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
 
             <input type="password" id="ustadz-pass" placeholder="Password (Kosongkan jika tidak diubah)"
-                class="w-full p-2 border rounded-lg text-sm">
+                class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
 
             <div class="grid">
-                <select id="ustadz-role" class="p-2 border rounded-lg text-sm bg-slate-50">
+                <select id="ustadz-role" class="p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
                     <option value="ustadz">Ustadz</option>
                     <option value="admin">Admin</option>
                 </select>
@@ -131,24 +159,53 @@
 
             <div class="flex gap-2">
                 <button type="submit" id="btn-ustadz-submit"
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm">Simpan
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl text-xs shadow-sm transition">Simpan
                     Akun</button>
                 <button type="button" id="btn-ustadz-cancel" onclick="resetFormUstadz()"
-                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-sm">Batal</button>
+                    class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2.5 rounded-xl text-xs transition">Batal</button>
             </div>
         </form>
 
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-500 border-b">
-                    <tr>
-                        <th class="p-3">Username</th>
-                        <th class="p-3">Role</th>
-                        <th class="p-3 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="list-ustadz-tb" class="divide-y"></tbody>
-            </table>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 text-slate-500 border-b">
+                        <tr>
+                            <th class="p-3">Username</th>
+                            <th class="p-3">Role</th>
+                            <th class="p-3 text-center w-28">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-ustadz-tb" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB 4: PRESENSI USTADZ -->
+    <section id="sec-absen-ustadz" class="hidden space-y-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold text-slate-600 uppercase">Kelola Presensi Ustadz</h3>
+                <input type="date" id="filter-tgl-absen" onchange="loadAbsenUstadzAdmin()"
+                    class="p-2 border rounded-xl text-xs bg-slate-50 focus:outline-emerald-600">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 text-slate-500 border-b">
+                        <tr>
+                            <th class="p-3">Nama Ustadz</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Keterangan</th>
+                            <th class="p-3 text-center w-28">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-absen-ustadz-tb" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
@@ -165,19 +222,73 @@
 
         function logout() { localStorage.clear(); window.location.href = '/login.html'; }
 
+        document.getElementById('filter-tgl-absen').value = new Date().toISOString().split('T')[0];
+
         function switchTab(tab) {
-            ['santri', 'halaqah', 'ustadz'].forEach(t => {
+            ['santri', 'halaqah', 'ustadz', 'absen-ustadz'].forEach(t => {
                 document.getElementById(`sec-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).className = 'py-2 px-4 text-xs font-medium text-slate-500 hover:text-slate-800';
+                document.getElementById(`tab-${t}`).className = 'py-2 px-3 text-xs font-medium text-slate-500 hover:text-slate-800 whitespace-nowrap';
             });
             document.getElementById(`sec-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).className = 'py-2 px-4 text-xs font-bold border-b-2 border-emerald-600 text-emerald-700';
+            document.getElementById(`tab-${tab}`).className = 'py-2 px-3 text-xs font-bold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap';
+
+            if (tab === 'absen-ustadz') loadAbsenUstadzAdmin();
+        }
+
+        async function loadAbsenUstadzAdmin() {
+            const tgl = document.getElementById('filter-tgl-absen').value;
+            const tb = document.getElementById('list-absen-ustadz-tb');
+            tb.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-slate-400">Memuat presensi...</td></tr>';
+
+            try {
+                const res = await fetch(`/api/login/absen-ustadz?tanggal=${tgl}`);
+                const { data } = await res.json();
+                tb.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tb.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-slate-400">Tidak ada data ustadz.</td></tr>';
+                    return;
+                }
+
+                data.forEach(u => {
+                    const isHadir = u.status === 'hadir';
+                    const isIzin = u.status === 'izin';
+
+                    tb.innerHTML += `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-semibold text-slate-800">${u.username}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isHadir ? 'bg-emerald-100 text-emerald-800' :
+                            isIzin ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-500'
+                        }">
+                            ${u.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-slate-500">${u.keterangan || '-'}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="hapusAtauUbahAbsen(${u.absenId})" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2 py-1 rounded-lg border border-rose-200 transition">
+                            Hapus
+                        </button>
+                    </td>
+                </tr>`;
+                });
+            } catch (err) {
+                tb.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-rose-500">Gagal memuat presensi.</td></tr>';
+            }
+        }
+
+        async function hapusAtauUbahAbsen(absenId) {
+            if (!absenId) return alert('Ustadz ini belum melakukan presensi.');
+            if (confirm('Hapus catatan presensi ini?')) {
+                await fetch(`/api/login/history/${absenId}`, { method: 'DELETE' });
+                loadAbsenUstadzAdmin();
+            }
         }
 
         let cacheSantri = [], cacheHalaqah = [], cacheUstadz = [];
 
         async function loadAllData() {
-            // 1. Fetch Ustadz (Perbaikan shadowing variabel cacheUstadz)
+            // 1. Fetch Ustadz
             const resAllU = await fetch('/api/admin/ustadz');
             cacheUstadz = (await resAllU.json()).data || [];
 
@@ -190,20 +301,20 @@
             tbU.innerHTML = '';
             optU.innerHTML = '<option value="">-- Pilih Ustadz PJ --</option>';
 
-            // Isi tabel Ustadz
             cacheUstadz.forEach(u => {
                 tbU.innerHTML += `
-            <tr>
-                <td class="p-3 font-semibold">${u.username}</td>
-                <td class="p-3 uppercase text-[10px]"><span class="bg-slate-100 px-2 py-0.5 rounded">${u.role}</span></td>
-                <td class="p-3 text-right space-x-1">
-                    <button onclick="editUstadz(${u.id})" class="text-blue-600 hover:underline">Edit</button>
-                    <button onclick="deleteUstadz(${u.id})" class="text-rose-600 hover:underline">Hapus</button>
+            <tr class="hover:bg-slate-50">
+                <td class="p-3 font-semibold text-slate-800">${u.username}</td>
+                <td class="p-3 uppercase text-[10px]"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${u.role}</span></td>
+                <td class="p-3 text-center whitespace-nowrap">
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button onclick="editUstadz(${u.id})" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold px-2 py-1 rounded-lg border border-amber-200 transition">Edit</button>
+                        <button onclick="deleteUstadz(${u.id})" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2 py-1 rounded-lg border border-rose-200 transition">Hapus</button>
+                    </div>
                 </td>
             </tr>`;
             });
 
-            // Isi Dropdown PJ Halaqah
             listOnlyUstadz.forEach(u => {
                 optU.innerHTML += `<option value="${u.id}">${u.username}</option>`;
             });
@@ -216,12 +327,14 @@
             tbH.innerHTML = ''; optH.innerHTML = '<option value="">-- Pilih Halaqah --</option>';
             cacheHalaqah.forEach(h => {
                 tbH.innerHTML += `
-          <tr>
-            <td class="p-3 font-semibold">${h.namaHalaqah}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-semibold text-slate-800">${h.namaHalaqah}</td>
             <td class="p-3 text-slate-500">${h.namaUstadz || '-'}</td>
-            <td class="p-3 text-right space-x-1">
-              <button onclick="editHalaqah(${h.id})" class="text-blue-600 hover:underline">Edit</button>
-              <button onclick="deleteHalaqah(${h.id})" class="text-rose-600 hover:underline">Hapus</button>
+            <td class="p-3 text-center whitespace-nowrap">
+                <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="editHalaqah(${h.id})" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold px-2 py-1 rounded-lg border border-amber-200 transition">Edit</button>
+                    <button onclick="deleteHalaqah(${h.id})" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2 py-1 rounded-lg border border-rose-200 transition">Hapus</button>
+                </div>
             </td>
           </tr>`;
                 optH.innerHTML += `<option value="${h.id}">${h.namaHalaqah}</option>`;
@@ -234,13 +347,14 @@
             tbS.innerHTML = '';
             cacheSantri.forEach(s => {
                 tbS.innerHTML += `
-          <tr>
-            <td class="p-3 font-semibold">${s.nama}</td>
-            <td class="p-3 capitalize">${s.kategori}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-semibold text-slate-800">${s.nama}</td>
             <td class="p-3 text-slate-500">${s.namaHalaqah || '-'}</td>
-            <td class="p-3 text-right space-x-1">
-              <button onclick="editSantri(${s.id})" class="text-blue-600 hover:underline">Edit</button>
-              <button onclick="deleteSantri(${s.id})" class="text-rose-600 hover:underline">Hapus</button>
+            <td class="p-3 text-center whitespace-nowrap">
+                <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="editSantri(${s.id})" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold px-2 py-1 rounded-lg border border-amber-200 transition">Edit</button>
+                    <button onclick="deleteSantri(${s.id})" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2 py-1 rounded-lg border border-rose-200 transition">Hapus</button>
+                </div>
             </td>
           </tr>`;
             });
@@ -258,7 +372,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     nama: document.getElementById('santri-nama').value,
-                    kategori: document.getElementById('santri-kategori').value,
                     halaqahId: document.getElementById('santri-halaqah').value,
                 })
             });
@@ -271,7 +384,6 @@
             if (!s) return;
             document.getElementById('edit-santri-id').value = s.id;
             document.getElementById('santri-nama').value = s.nama;
-            document.getElementById('santri-kategori').value = s.kategori;
             document.getElementById('santri-halaqah').value = s.halaqahId || '';
             document.getElementById('title-santri').innerText = 'Edit Data Santri';
             document.getElementById('btn-santri-submit').innerText = 'Update Santri';
@@ -344,7 +456,6 @@
             const editId = document.getElementById('edit-ustadz-id').value;
             const password = document.getElementById('ustadz-pass').value;
 
-            // Validasi password saat buat ustadz baru
             if (!editId && !password) {
                 alert('Password wajib diisi untuk akun baru!');
                 return;
